@@ -10,6 +10,7 @@ python3 train.py \
     --img_height 120 \
     --img_width 160 \
     --batch_size 128 \
+    --z_dim 2000 \
     --enc_lr 1e-4 \
     --dec_lr 1e-4 \
     --num_epochs 100 \

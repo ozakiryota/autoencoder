@@ -37,9 +37,9 @@ class Trainer:
         arg_parser.add_argument('--img_height', type=int, default=240)
         arg_parser.add_argument('--img_width', type=int, default=320)
         arg_parser.add_argument('--batch_size', type=int, default=100)
-        # arg_parser.add_argument('--z_dim', type=int, default=5000)
+        arg_parser.add_argument('--z_dim', type=int, default=1000)
         # arg_parser.add_argument('--conv_unit_ch', type=int, default=32)
-        # arg_parser.add_argument('--load_weights_dir')
+        arg_parser.add_argument('--load_weights_dir')
         arg_parser.add_argument('--flag_use_multi_gpu', action='store_true')
         arg_parser.add_argument('--enc_lr', type=float, default=1e-5)
         arg_parser.add_argument('--dec_lr', type=float, default=1e-5)
@@ -75,30 +75,24 @@ class Trainer:
         return dataloader
 
     def getNetwork(self):
-        enc_net = Encoder()
-        dec_net = Decoder()
+        enc_net = Encoder(self.args.img_height, self.args.img_width, self.args.z_dim)
+        dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim)
 
-        # if self.args.load_weights_dir is not None:
-        #     gen_weights_path = os.path.join(self.args.load_weights_dir, 'generator.pth')
-        #     dis_weights_path = os.path.join(self.args.load_weights_dir, 'discriminator.pth')
-        #     enc_weights_path = os.path.join(self.args.load_weights_dir, 'encoder.pth')
-        #     if self.device == torch.device('cpu'):
-        #         loaded_gen_weights = torch.load(gen_weights_path, map_location={"cuda:0": "cpu"})
-        #         print("load [GPU -> CPU]:", gen_weights_path)
-        #         loaded_dis_weights = torch.load(dis_weights_path, map_location={"cuda:0": "cpu"})
-        #         print("load [GPU -> CPU]:", dis_weights_path)
-        #         loaded_enc_weights = torch.load(enc_weights_path, map_location={"cuda:0": "cpu"})
-        #         print("load [GPU -> CPU]:", enc_weights_path)
-        #     else:
-        #         loaded_gen_weights = torch.load(gen_weights_path)
-        #         print("load [GPU -> GPU]:", gen_weights_path)
-        #         loaded_dis_weights = torch.load(dis_weights_path)
-        #         print("load [GPU -> GPU]:", dis_weights_path)
-        #         loaded_enc_weights = torch.load(enc_weights_path)
-        #         print("load [GPU -> GPU]:", enc_weights_path)
-        #     gen_net.load_state_dict(loaded_gen_weights)
-        #     dis_net.load_state_dict(loaded_dis_weights)
-        #     enc_net.load_state_dict(loaded_enc_weights)
+        if self.args.load_weights_dir is not None:
+            enc_weights_path = os.path.join(self.args.load_weights_dir, 'encoder.pth')
+            dec_weights_path = os.path.join(self.args.load_weights_dir, 'decoder.pth')
+            if self.device == torch.device('cpu'):
+                loaded_enc_weights = torch.load(enc_weights_path, map_location={"cuda:0": "cpu"})
+                print("load [GPU -> CPU]:", enc_weights_path)
+                loaded_dec_weights = torch.load(dec_weights_path, map_location={"cuda:0": "cpu"})
+                print("load [GPU -> CPU]:", dec_weights_path)
+            else:
+                loaded_enc_weights = torch.load(enc_weights_path)
+                print("load [GPU -> GPU]:", enc_weights_path)
+                loaded_dec_weights = torch.load(dec_weights_path)
+                print("load [GPU -> GPU]:", dec_weights_path)
+            enc_net.load_state_dict(loaded_enc_weights)
+            dec_net.load_state_dict(loaded_dec_weights)
 
         enc_net.to(self.device)
         dec_net.to(self.device)
@@ -121,9 +115,9 @@ class Trainer:
             + str(len(self.dataloader.dataset)) + 'sample' \
             + str(self.args.batch_size) + 'batch' \
             + str(self.args.num_epochs) + 'epoch'
-        # if self.args.load_weights_dir is not None:
-        #     insert_index = info_str.find('epoch')
-        #     info_str = info_str[:insert_index] + '+' + info_str[insert_index:]
+        if self.args.load_weights_dir is not None:
+            insert_index = info_str.find('epoch')
+            info_str = info_str[:insert_index] + '+' + info_str[insert_index:]
         info_str = info_str.replace('-', '').replace('.', '')
 
         print("self.device =", self.device)
@@ -138,7 +132,7 @@ class Trainer:
         return tb_writer
 
     def train(self):
-        # torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.benchmark = True
         
         loss_record = []
         start_clock = time.time()

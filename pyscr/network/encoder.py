@@ -3,16 +3,17 @@ from torchvision import models
 
 
 class Encoder(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, img_height, img_width, z_dim):
         super(Encoder, self).__init__()
 
         self.conv = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1).features
         # self.conv = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1).features
+        dim_fc_in = 512 * (img_height // 32) * (img_width // 32)
 
         self.fc = torch.nn.Sequential(
-            torch.nn.Linear(7680, 3000),
+            torch.nn.Linear(dim_fc_in, dim_fc_in // 2),
             torch.nn.ReLU(inplace=True),
-            torch.nn.Linear(3000, 2000)
+            torch.nn.Linear(dim_fc_in // 2, z_dim)
         )
 
     def forward(self, inputs):
@@ -31,7 +32,8 @@ def test():
     img_width = 320
     inputs = torch.randn(batch_size, 3, img_height, img_width).to(device)
     ## encode
-    enc_net = Encoder().to(device)
+    z_dim = 1000
+    enc_net = Encoder(img_height, img_width, z_dim).to(device)
     enc_net.train()
     outputs = enc_net(inputs)
     ## debug

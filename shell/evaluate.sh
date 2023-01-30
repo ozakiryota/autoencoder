@@ -9,5 +9,6 @@ python3 evaluate.py \
     --csv_target_col 1 \
     --img_height 120 \
     --img_width 160 \
+    --z_dim 2000 \
     --load_weights_dir $exec_pwd/../weights/120pixel00001lre00001lrd1000sample128batch100epoch \
     --flag_show_reconstracted_images

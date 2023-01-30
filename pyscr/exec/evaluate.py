@@ -34,7 +34,7 @@ class Evaluator:
         arg_parser.add_argument('--csv_target_col', nargs='+', type=int)
         arg_parser.add_argument('--img_height', type=int, default=240)
         arg_parser.add_argument('--img_width', type=int, default=320)
-        # arg_parser.add_argument('--z_dim', type=int, default=100)
+        arg_parser.add_argument('--z_dim', type=int, default=100)
         # arg_parser.add_argument('--conv_unit_ch', type=int, default=32)
         arg_parser.add_argument('--load_weights_dir', default='../../weights')
         arg_parser.add_argument('--save_fig_dir', default='../../fig')
@@ -61,8 +61,8 @@ class Evaluator:
         return dataset
 
     def getNetwork(self):
-        enc_net = Encoder()
-        dec_net = Decoder()
+        enc_net = Encoder(self.args.img_height, self.args.img_width, self.args.z_dim)
+        dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim)
 
         enc_weights_path = os.path.join(self.args.load_weights_dir, 'encoder.pth')
         dec_weights_path = os.path.join(self.args.load_weights_dir, 'decoder.pth')

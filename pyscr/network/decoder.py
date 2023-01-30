@@ -2,50 +2,54 @@ import torch
 
 
 class Decoder(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, img_height, img_width, z_dim):
         super(Decoder, self).__init__()
 
         conv_unit_ch = 32
+        height_factor_list = self.prime_factorize(img_height)
+        width_factor_list = self.prime_factorize(img_width)
+        while len(height_factor_list) != len(width_factor_list):
+            if len(height_factor_list) < len(width_factor_list):
+                height_factor_list.append(1)
+            else:
+                width_factor_list.append(1)
+        
+        deconv_list = []
+        for i, (height_factor, width_factor) in enumerate(zip(height_factor_list, width_factor_list)):
+            in_ch_dim = 2 ** (len(height_factor_list) - i - 1)
+            out_ch_dim = in_ch_dim // 2
+            if i == len(height_factor_list) - 1:
+                deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim * conv_unit_ch, 3, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
+                deconv_list.append(torch.nn.Tanh())
+            else:
+                if i == 0:
+                    deconv_list.append(torch.nn.ConvTranspose2d(z_dim, out_ch_dim * conv_unit_ch, kernel_size=(height_factor, width_factor), stride=1, padding=0))
+                else:
+                    deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim * conv_unit_ch, out_ch_dim * conv_unit_ch, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
+                deconv_list.append(torch.nn.BatchNorm2d(out_ch_dim * conv_unit_ch))
+                deconv_list.append(torch.nn.ReLU(inplace=True))
+        self.deconv = torch.nn.Sequential(*deconv_list)
 
-        self.deconv = torch.nn.Sequential(
-            torch.nn.ConvTranspose2d(2000, 32 * conv_unit_ch, kernel_size=(3, 4), stride=1, padding=0),
-            torch.nn.BatchNorm2d(32 * conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 3 x 4
-            
-            torch.nn.ConvTranspose2d(32 * conv_unit_ch, 16 * conv_unit_ch, kernel_size=4, stride=2, padding=1),
-            torch.nn.BatchNorm2d(16 * conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 6 x 8
-
-            torch.nn.ConvTranspose2d(16 * conv_unit_ch, 8 * conv_unit_ch, kernel_size=4, stride=2, padding=1),
-            torch.nn.BatchNorm2d(8 * conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 12 x 16
-
-            torch.nn.ConvTranspose2d(8 * conv_unit_ch, 4 * conv_unit_ch, kernel_size=(4, 5), stride=1, padding=0),
-            torch.nn.BatchNorm2d(4 * conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 15 x 20
-
-            torch.nn.ConvTranspose2d(4 * conv_unit_ch, 2 * conv_unit_ch, kernel_size=4, stride=2, padding=1),
-            torch.nn.BatchNorm2d(2 * conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 30 x 40
-
-            torch.nn.ConvTranspose2d(2 * conv_unit_ch, conv_unit_ch, kernel_size=4, stride=2, padding=1),
-            torch.nn.BatchNorm2d(conv_unit_ch),
-            torch.nn.ReLU(inplace=True),
-            ## ch x 60 x 80
-
-            torch.nn.ConvTranspose2d(conv_unit_ch, 3, kernel_size=4, stride=2, padding=1),
-            torch.nn.Tanh()
-            ## ch x 120 x 160
-        )
+    def prime_factorize(self, num):
+        factor_list = []
+        while num % 2 == 0:
+            factor_list.append(2)
+            num //= 2
+        f = 3
+        while f * f <= num:
+            if num % f == 0:
+                factor_list.append(f)
+                num //= f
+            else:
+                f += 2
+        if num != 1:
+            factor_list.append(num)
+        factor_list.reverse()
+        return factor_list
 
     def forward(self, inputs):
-        outputs = inputs.view(inputs.size(0), -1, 1, 1)
-        outputs = self.deconv(outputs)
+        inputs = inputs.view(inputs.size(0), -1, 1, 1)
+        outputs = self.deconv(inputs)
         return outputs
 
 
@@ -60,7 +64,9 @@ def test():
     z_dim = 5000
     inputs = torch.randn(batch_size, z_dim).to(device)
     ## decode
-    gen_net = Decoder().to(device)
+    img_height = 120
+    img_width = 160
+    gen_net = Decoder(img_height, img_width, z_dim).to(device)
     gen_net.train()
     outputs = gen_net(inputs)
     ## debug
