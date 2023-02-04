@@ -11,9 +11,9 @@ class Encoder(torch.nn.Module):
         dim_fc_in = 512 * (img_height // 32) * (img_width // 32)
 
         self.fc = torch.nn.Sequential(
-            torch.nn.Linear(dim_fc_in, dim_fc_in // 2),
+            torch.nn.Linear(dim_fc_in, dim_fc_in + (dim_fc_in - z_dim) // 2),
             torch.nn.ReLU(inplace=True),
-            torch.nn.Linear(dim_fc_in // 2, z_dim)
+            torch.nn.Linear(dim_fc_in + (dim_fc_in - z_dim) // 2, z_dim)
         )
 
     def forward(self, inputs):

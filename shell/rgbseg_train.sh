@@ -4,13 +4,14 @@ exec_pwd=$(cd $(dirname $0); pwd)
 
 cd $exec_pwd/../pyscr/exec
 
-python3 train.py \
+python3 rgbseg_train.py \
     --dataset_dirs $HOME/dataset/airsim/center_road_south2north_1000 \
-    --csv_target_col 1 \
+    --csv_name file_list_grayscaled.csv \
+    --csv_target_col 0 1 \
     --img_height 120 \
     --img_width 160 \
-    --batch_size 128 \
-    --z_dim 3000 \
+    --batch_size 64 \
+    --z_dim 5000 \
     --enc_lr 1e-4 \
     --dec_lr 1e-4 \
     --num_epochs 100 \

@@ -21,6 +21,7 @@ class Trainer:
         self.args = self.setArgument().parse_args()
         self.checkArgument()
         self.device = torch.device(self.args.device if torch.cuda.is_available() else 'cpu')
+        print("self.device =", self.device)
         self.dataloader = self.getDataLoader()
         self.enc_net, self.dec_net = self.getNetwork()
         self.l1_criterion = torch.nn.L1Loss(reduction='mean')
@@ -119,10 +120,6 @@ class Trainer:
             insert_index = info_str.find('epoch')
             info_str = info_str[:insert_index] + '+' + info_str[insert_index:]
         info_str = info_str.replace('-', '').replace('.', '')
-
-        print("self.device =", self.device)
-        print("info_str =", info_str)
-
         return info_str
 
     def getWriter(self):
@@ -192,8 +189,8 @@ class Trainer:
         insert_index = save_weights_dir.find('batch') + len('batch')
         save_weights_dir = save_weights_dir[:insert_index] + str(epoch) + save_weights_dir[insert_index + len(str(self.args.num_epochs)):]
         os.makedirs(save_weights_dir, exist_ok=True)
-        save_dec_weights_path = os.path.join(save_weights_dir, 'decoder.pth')
         save_enc_weights_path = os.path.join(save_weights_dir, 'encoder.pth')
+        save_dec_weights_path = os.path.join(save_weights_dir, 'decoder.pth')
         if self.args.flag_use_multi_gpu:
             torch.save(self.enc_net.module.state_dict(), save_enc_weights_path)
             torch.save(self.dec_net.module.state_dict(), save_dec_weights_path)

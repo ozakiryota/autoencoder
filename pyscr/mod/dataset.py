@@ -15,9 +15,15 @@ class AnomalyDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         img_path = self.file_path_list_list[index][0]
         img_pil = Image.open(img_path).convert('RGB')
-        img_tensor = self.data_transformer(img_pil, self.is_train)
         label = self.given_label
-        return img_tensor, label
+        if len(self.file_path_list_list[index]) == 1:
+            img_tensor = self.data_transformer(img_pil, is_train=self.is_train)
+            return img_tensor, label
+        else:
+            seg_img_path = self.file_path_list_list[index][1]
+            seg_img_pil = Image.open(seg_img_path).convert('L')
+            img_tensor, seg_img_tensor = self.data_transformer(img_pil, seg_img_pil, self.is_train)
+            return img_tensor, seg_img_tensor, label
 
 
 def test():
