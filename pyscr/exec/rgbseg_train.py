@@ -26,7 +26,7 @@ class RgbSegTrainer(Trainer):
         print("self.device =", self.device)
         self.dataloader = self.getDataLoader()
         self.rgb_enc_net, self.seg_enc_net, self.dec_net = self.getNetwork()
-        self.l1_criterion = torch.nn.L1Loss(reduction='mean')
+        self.criterion = torch.nn.MSELoss(reduction='mean')
         self.rgb_enc_optimizer, self.seg_enc_optimizer, self.dec_optimizer = self.getOptimizer()
         self.info_str = self.getInfoStr()
         self.tb_writer = self.getWriter()
@@ -126,7 +126,7 @@ class RgbSegTrainer(Trainer):
         seg_feature_list = self.seg_enc_net(seg_inputs)
         outputs = self.dec_net(rgb_feature, seg_feature_list)
 
-        loss = self.l1_criterion(rgb_inputs, outputs)
+        loss = self.criterion(rgb_inputs, outputs)
 
         self.rgb_enc_optimizer.zero_grad()
         self.seg_enc_optimizer.zero_grad()

@@ -24,7 +24,7 @@ class Trainer:
         print("self.device =", self.device)
         self.dataloader = self.getDataLoader()
         self.enc_net, self.dec_net = self.getNetwork()
-        self.l1_criterion = torch.nn.L1Loss(reduction='mean')
+        self.criterion = torch.nn.MSELoss(reduction='mean')
         self.enc_optimizer, self.dec_optimizer = self.getOptimizer()
         self.info_str = self.getInfoStr()
         self.tb_writer = self.getWriter()
@@ -166,7 +166,7 @@ class Trainer:
         z = self.enc_net(inputs)
         outputs = self.dec_net(z)
 
-        loss = self.l1_criterion(inputs, outputs)
+        loss = self.criterion(inputs, outputs)
 
         self.enc_optimizer.zero_grad()
         self.dec_optimizer.zero_grad()
