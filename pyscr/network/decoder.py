@@ -6,7 +6,7 @@ from mod.prime_factorize import primeFactorize
 
 
 class Decoder(torch.nn.Module):
-    def __init__(self, img_height, img_width, z_dim):
+    def __init__(self, img_height, img_width, z_dim, deconv_unit_ch):
         super(Decoder, self).__init__()
 
         height_factor_list = primeFactorize(img_height, is_ascending_order=False)
@@ -17,20 +17,19 @@ class Decoder(torch.nn.Module):
             else:
                 width_factor_list.append(1)
         
-        conv_unit_ch = 32
         deconv_list = []
         for i, (height_factor, width_factor) in enumerate(zip(height_factor_list, width_factor_list)):
-            in_ch_dim = 2 ** (len(height_factor_list) - i - 1)
+            in_ch_dim = 2 ** (len(height_factor_list) - i - 1) * deconv_unit_ch
             out_ch_dim = in_ch_dim // 2
             if i == len(height_factor_list) - 1:
-                deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim * conv_unit_ch, 3, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
+                deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim, 3, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
                 deconv_list.append(torch.nn.Tanh())
             else:
                 if i == 0:
-                    deconv_list.append(torch.nn.ConvTranspose2d(z_dim, out_ch_dim * conv_unit_ch, kernel_size=(height_factor, width_factor), stride=1, padding=0))
+                    deconv_list.append(torch.nn.ConvTranspose2d(z_dim, out_ch_dim, kernel_size=(height_factor, width_factor), stride=1, padding=0))
                 else:
-                    deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim * conv_unit_ch, out_ch_dim * conv_unit_ch, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
-                deconv_list.append(torch.nn.BatchNorm2d(out_ch_dim * conv_unit_ch))
+                    deconv_list.append(torch.nn.ConvTranspose2d(in_ch_dim, out_ch_dim, kernel_size=(height_factor + 2, width_factor + 2), stride=(height_factor, width_factor), padding=1))
+                deconv_list.append(torch.nn.BatchNorm2d(out_ch_dim))
                 deconv_list.append(torch.nn.ReLU(inplace=True))
         self.deconv = torch.nn.Sequential(*deconv_list)
 

@@ -6,7 +6,7 @@ from mod.prime_factorize import primeFactorize
 
 
 class SegEncoder(torch.nn.Module):
-    def __init__(self, img_ch, img_height, img_width, z_dim):
+    def __init__(self, img_ch, img_height, img_width, z_dim, conv_unit_ch):
         super(SegEncoder, self).__init__()
 
         height_factor_list = primeFactorize(img_height, is_ascending_order=True)
@@ -17,7 +17,6 @@ class SegEncoder(torch.nn.Module):
             else:
                 width_factor_list.insert(0, 1)
         
-        conv_unit_ch = 32
         self.conv_list = []
         for i, (height_factor, width_factor) in enumerate(zip(height_factor_list, width_factor_list)):
             in_ch_dim = i * conv_unit_ch

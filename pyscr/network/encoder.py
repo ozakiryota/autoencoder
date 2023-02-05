@@ -3,11 +3,14 @@ from torchvision import models
 
 
 class Encoder(torch.nn.Module):
-    def __init__(self, img_height, img_width, z_dim):
+    def __init__(self, img_height, img_width, z_dim, is_train):
         super(Encoder, self).__init__()
 
-        self.conv = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1).features
-        # self.conv = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1).features
+        if is_train:
+            self.conv = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1).features
+            # self.conv = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1).features
+        else:
+            self.conv = models.vgg16().features
         dim_fc_in = 512 * (img_height // 32) * (img_width // 32)
 
         self.fc = torch.nn.Sequential(

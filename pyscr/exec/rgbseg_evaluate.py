@@ -28,10 +28,15 @@ class RgbSegEvaluator(Evaluator):
         self.rgb_enc_net, self.seg_enc_net, self.dec_net = self.getNetwork()
         self.l1_criterion = torch.nn.L1Loss(reduction='mean')
 
+    def setArgument(self):
+        arg_parser = super(RgbSegEvaluator, self).setArgument()
+        arg_parser.add_argument('--num_classes', type=int, default=256)
+        return arg_parser
+
     def getNetwork(self):
-        rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim)
-        seg_enc_net = SegEncoder(256, self.args.img_height, self.args.img_width, self.args.z_dim)
-        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim)
+        rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=False)
+        seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
+        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
 
         rgb_enc_weights_path = os.path.join(self.args.load_weights_dir, 'rgb_encoder.pth')
         seg_enc_weights_path = os.path.join(self.args.load_weights_dir, 'seg_encoder.pth')
@@ -79,7 +84,6 @@ class RgbSegEvaluator(Evaluator):
                 seg_feature_list = self.seg_enc_net(seg_inputs)
                 outputs = self.dec_net(rgb_feature, seg_feature_list)
                 anomaly_score = self.l1_criterion(rgb_inputs, outputs).item()
-            # print("anomaly_score =", anomaly_score)
 
             images_list.append([rgb_inputs.squeeze(0).cpu().detach().numpy(), outputs.squeeze(0).cpu().detach().numpy()])
             label_list.append(label)

@@ -31,10 +31,15 @@ class RgbSegTrainer(Trainer):
         self.info_str = self.getInfoStr()
         self.tb_writer = self.getWriter()
 
+    def setArgument(self):
+        arg_parser = super(RgbSegTrainer, self).setArgument()
+        arg_parser.add_argument('--num_classes', type=int, default=256)
+        return arg_parser
+
     def getNetwork(self):
-        rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim)
-        seg_enc_net = SegEncoder(256, self.args.img_height, self.args.img_width, self.args.z_dim)
-        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim)
+        rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=True)
+        seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
+        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
 
         if self.args.load_weights_dir is not None:
             rgb_enc_weights_path = os.path.join(self.args.load_weights_dir, 'rgb_encoder.pth')

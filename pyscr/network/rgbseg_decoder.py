@@ -6,7 +6,7 @@ from mod.prime_factorize import primeFactorize
 
 
 class RgbSegDecoder(torch.nn.Module):
-    def __init__(self, img_height, img_width, z_dim):
+    def __init__(self, img_height, img_width, z_dim, deconv_unit_ch):
         super(RgbSegDecoder, self).__init__()
 
         height_factor_list = primeFactorize(img_height, is_ascending_order=False)
@@ -17,11 +17,10 @@ class RgbSegDecoder(torch.nn.Module):
             else:
                 width_factor_list.append(1)
         
-        conv_unit_ch = 32
         self.deconv_list = []
         for i, (height_factor, width_factor) in enumerate(zip(height_factor_list, width_factor_list)):
-            in_ch_dim = 2 * (len(height_factor_list) - i) * conv_unit_ch
-            out_ch_dim = (len(height_factor_list) - i - 1) * conv_unit_ch
+            in_ch_dim = 2 * (len(height_factor_list) - i) * deconv_unit_ch
+            out_ch_dim = (len(height_factor_list) - i - 1) * deconv_unit_ch
             if i == 0:
                 tmp_deconv = torch.nn.Sequential(
                     torch.nn.ConvTranspose2d(z_dim + in_ch_dim // 2, out_ch_dim, kernel_size=(height_factor, width_factor), stride=1, padding=0),
