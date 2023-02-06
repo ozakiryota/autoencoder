@@ -83,6 +83,8 @@ class RgbSegEvaluator(Evaluator):
                 rgb_feature = self.rgb_enc_net(rgb_inputs)
                 seg_feature_list = self.seg_enc_net(seg_inputs)
                 outputs = self.dec_net(rgb_feature, seg_feature_list)
+                rgb_inputs = self.data_transformer.inverseNormalizedImage(rgb_inputs)
+                outputs = self.data_transformer.inverseNormalizedImage(outputs)
                 anomaly_score = self.l1_criterion(rgb_inputs, outputs).item()
 
             images_list.append([rgb_inputs.squeeze(0).cpu().detach().numpy(), outputs.squeeze(0).cpu().detach().numpy()])

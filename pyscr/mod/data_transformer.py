@@ -21,6 +21,10 @@ class DataTransformer():
             transforms.CenterCrop(resize),
             transforms.PILToTensor()
         ])
+        self.inv_img_transformer = transforms.Compose([
+            transforms.Normalize([0, 0, 0], [1 / s for s in std]),
+            transforms.Normalize([-m for m in mean], [1, 1, 1])
+        ])
 
     def __call__(self, img_pil, seg_img_pil=None, is_train=True):
         if is_train:
@@ -38,6 +42,9 @@ class DataTransformer():
             seg_img_tensor = torch.nn.functional.one_hot(seg_img_tensor.to(torch.int64), num_classes=256)
             seg_img_tensor = torch.permute(seg_img_tensor, (2, 0, 1)).to(torch.float32)
             return img_tensor, seg_img_tensor
+
+    def inverseNormalizedImage(self, img_tensor):
+        return self.inv_img_transformer(img_tensor)
 
 
 def test():

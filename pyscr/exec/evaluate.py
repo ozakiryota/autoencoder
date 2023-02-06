@@ -55,9 +55,9 @@ class Evaluator:
         ## data transformer
         mean = ([0.5, 0.5, 0.5])
         std = ([0.5, 0.5, 0.5])
-        data_transformer = DataTransformer((self.args.img_height, self.args.img_width), mean, std)
+        self.data_transformer = DataTransformer((self.args.img_height, self.args.img_width), mean, std)
         ## dataset
-        dataset = AnomalyDataset(file_path_list_list, data_transformer, is_train=False)
+        dataset = AnomalyDataset(file_path_list_list, self.data_transformer, is_train=False)
         return dataset
 
     def getNetwork(self):
@@ -99,6 +99,8 @@ class Evaluator:
             with torch.set_grad_enabled(False):
                 z = self.enc_net(inputs)
                 outputs = self.dec_net(z)
+                inputs = self.data_transformer.inverseNormalizedImage(inputs)
+                outputs = self.data_transformer.inverseNormalizedImage(outputs)
                 anomaly_score = self.l1_criterion(inputs, outputs).item()
 
             images_list.append([inputs.squeeze(0).cpu().detach().numpy(), outputs.squeeze(0).cpu().detach().numpy()])
