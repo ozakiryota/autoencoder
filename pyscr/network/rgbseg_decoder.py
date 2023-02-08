@@ -6,7 +6,7 @@ from mod.prime_factorize import primeFactorize
 
 
 class RgbSegDecoder(torch.nn.Module):
-    def __init__(self, img_height, img_width, z_dim, deconv_unit_ch):
+    def __init__(self, img_height, img_width, z_dim, conv_unit_ch, deconv_unit_ch):
         super(RgbSegDecoder, self).__init__()
 
         height_factor_list = primeFactorize(img_height, is_ascending_order=False)
@@ -19,11 +19,12 @@ class RgbSegDecoder(torch.nn.Module):
         
         self.deconv_list = []
         for i, (height_factor, width_factor) in enumerate(zip(height_factor_list, width_factor_list)):
-            in_ch_dim = 2 * (len(height_factor_list) - i) * deconv_unit_ch
+            concat_ch_dim = (len(height_factor_list) - i) * conv_unit_ch
+            in_ch_dim = (len(height_factor_list) - i) * deconv_unit_ch + concat_ch_dim
             out_ch_dim = (len(height_factor_list) - i - 1) * deconv_unit_ch
             if i == 0:
                 tmp_deconv = torch.nn.Sequential(
-                    torch.nn.ConvTranspose2d(z_dim + in_ch_dim // 2, out_ch_dim, kernel_size=(height_factor, width_factor), stride=1, padding=0),
+                    torch.nn.ConvTranspose2d(z_dim + concat_ch_dim, out_ch_dim, kernel_size=(height_factor, width_factor), stride=1, padding=0),
                     torch.nn.BatchNorm2d(out_ch_dim),
                     torch.nn.ReLU(inplace=True)
                 )
@@ -68,11 +69,13 @@ def test():
     img_ch = 10
     img_height = 120
     img_width = 160
+    conv_unit_ch = 16
     rgb_feature = torch.randn(batch_size, z_dim).to(device)
-    seg_enc_net = SegEncoder(img_ch, img_height, img_width, z_dim).to(device)
+    seg_enc_net = SegEncoder(img_ch, img_height, img_width, z_dim, conv_unit_ch).to(device)
     seg_feature_list = seg_enc_net(torch.randn(batch_size, img_ch, img_height, img_width).to(device))
     ## decode
-    dec_net = RgbSegDecoder(img_height, img_width, z_dim).to(device)
+    deconv_unit_ch = 32
+    dec_net = RgbSegDecoder(img_height, img_width, z_dim, conv_unit_ch, deconv_unit_ch).to(device)
     dec_net.train()
     outputs = dec_net(rgb_feature, seg_feature_list)
     ## debug

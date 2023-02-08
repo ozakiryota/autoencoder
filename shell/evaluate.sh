@@ -10,6 +10,6 @@ python3 evaluate.py \
     --img_height 120 \
     --img_width 160 \
     --z_dim 5000 \
-    --conv_unit_ch 64 \
+    --deconv_unit_ch 64 \
     --load_weights_dir $exec_pwd/../weights/120pix5000z00001lre00001lrd1000sample64batch100epoch \
     --flag_show_reconstracted_images

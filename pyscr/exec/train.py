@@ -39,7 +39,7 @@ class Trainer:
         arg_parser.add_argument('--img_width', type=int, default=320)
         arg_parser.add_argument('--batch_size', type=int, default=100)
         arg_parser.add_argument('--z_dim', type=int, default=1000)
-        arg_parser.add_argument('--conv_unit_ch', type=int, default=32)
+        arg_parser.add_argument('--deconv_unit_ch', type=int, default=32)
         arg_parser.add_argument('--load_weights_dir')
         arg_parser.add_argument('--flag_use_multi_gpu', action='store_true')
         arg_parser.add_argument('--enc_lr', type=float, default=1e-5)
@@ -76,7 +76,7 @@ class Trainer:
 
     def getNetwork(self):
         enc_net = Encoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=True)
-        dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
+        dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.deconv_unit_ch)
 
         if self.args.load_weights_dir is not None:
             enc_weights_path = os.path.join(self.args.load_weights_dir, 'encoder.pth')

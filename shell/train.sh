@@ -11,7 +11,7 @@ python3 train.py \
     --img_width 160 \
     --batch_size 64 \
     --z_dim 5000 \
-    --conv_unit_ch 64 \
+    --deconv_unit_ch 64 \
     --enc_lr 1e-4 \
     --dec_lr 1e-4 \
     --num_epochs 100 \

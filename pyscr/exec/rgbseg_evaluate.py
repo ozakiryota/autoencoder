@@ -31,12 +31,13 @@ class RgbSegEvaluator(Evaluator):
     def setArgument(self):
         arg_parser = super(RgbSegEvaluator, self).setArgument()
         arg_parser.add_argument('--num_classes', type=int, default=256)
+        arg_parser.add_argument('--conv_unit_ch', type=int, default=32)
         return arg_parser
 
     def getNetwork(self):
         rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=False)
-        seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
-        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
+        seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.deconv_unit_ch)
+        dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch, self.args.deconv_unit_ch)
 
         rgb_enc_weights_path = os.path.join(self.args.load_weights_dir, 'rgb_encoder.pth')
         seg_enc_weights_path = os.path.join(self.args.load_weights_dir, 'seg_encoder.pth')
