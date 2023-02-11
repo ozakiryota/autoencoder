@@ -84,6 +84,8 @@ class RgbSegTrainer(Trainer):
     def getInfoStr(self):
         info_str = super(RgbSegTrainer, self).getInfoStr()
         info_str = 'rgbseg' + info_str
+        insert_index = info_str.find('z') + 1
+        info_str = info_str[:insert_index] + str(self.args.conv_unit_ch) + 'conv' + info_str[insert_index:]
         return info_str
 
     def train(self):

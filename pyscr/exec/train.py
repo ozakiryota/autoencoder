@@ -111,6 +111,7 @@ class Trainer:
     def getInfoStr(self):
         info_str = str(self.args.img_height) + 'pix' \
             + str(self.args.z_dim) + 'z' \
+            + str(self.args.deconv_unit_ch) + 'deconv' \
             + str(self.args.enc_lr) + 'lre' \
             + str(self.args.dec_lr) + 'lrd' \
             + str(len(self.dataloader.dataset)) + 'sample' \
