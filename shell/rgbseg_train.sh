@@ -10,6 +10,7 @@ python3 rgbseg_train.py \
     --csv_target_col 0 1 \
     --img_height 120 \
     --img_width 160 \
+    --rotation_range_deg 5 \
     --batch_size 32 \
     --z_dim 5000 \
     --deconv_unit_ch 128 \

@@ -1,12 +1,13 @@
 from PIL import ImageOps
 import random
+import math
 
 import torch
 from torchvision import transforms
 
 
 class DataTransformer():
-    def __init__(self, resize, mean, std):
+    def __init__(self, resize, mean, std, rotation_range_deg=None):
         self.resize = resize
         self.mean = mean
         self.std = std
@@ -25,6 +26,7 @@ class DataTransformer():
             transforms.Normalize([0, 0, 0], [1 / s for s in std]),
             transforms.Normalize([-m for m in mean], [1, 1, 1])
         ])
+        self.rotation_range_deg = rotation_range_deg
 
     def __call__(self, img_pil, seg_img_pil=None, is_train=True):
         if is_train:
@@ -34,6 +36,11 @@ class DataTransformer():
                 img_pil = ImageOps.mirror(img_pil)
                 if seg_img_pil != None:
                     seg_img_pil = ImageOps.mirror(seg_img_pil)
+            if self.rotation_range_deg != None and self.rotation_range_deg != 0:
+                angle_deg = random.uniform(-self.rotation_range_deg, self.rotation_range_deg)
+                img_pil = img_pil.rotate(angle_deg)
+                if seg_img_pil != None:
+                    seg_img_pil = seg_img_pil.rotate(angle_deg)
         img_tensor = self.img_transformer(img_pil)
         if seg_img_pil == None:
             return img_tensor

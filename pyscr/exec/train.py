@@ -38,6 +38,7 @@ class Trainer:
         arg_parser.add_argument('--csv_target_col', nargs='+', type=int)
         arg_parser.add_argument('--img_height', type=int, default=240)
         arg_parser.add_argument('--img_width', type=int, default=320)
+        arg_parser.add_argument('--rotation_range_deg', type=float)
         arg_parser.add_argument('--batch_size', type=int, default=100)
         arg_parser.add_argument('--z_dim', type=int, default=1000)
         arg_parser.add_argument('--deconv_unit_ch', type=int, default=32)
@@ -66,7 +67,7 @@ class Trainer:
         ## data transformer
         mean = ([0.5, 0.5, 0.5])
         std = ([0.5, 0.5, 0.5])
-        data_transformer = DataTransformer((self.args.img_height, self.args.img_width), mean, std)
+        data_transformer = DataTransformer((self.args.img_height, self.args.img_width), mean, std, self.args.rotation_range_deg)
         ## dataset
         dataset = AnomalyDataset(file_path_list_list, data_transformer, is_train=True)
         ## dataloader
