@@ -4,7 +4,9 @@ if [ $# != 1 ]; then
 	echo "Usage: ./tensorboard.sh LOG_DIR"
 	exit 1
 fi
-log_dir=`basename $@`
+split_path=(${@//\// })
+exp_dir=${split_path[-2]}
+tb_dir=${split_path[-1]}
 
 xhost +
 
@@ -21,6 +23,6 @@ docker run \
 	-v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--net=host \
 	-p 6006:6006 \
-	-v $(pwd)/../log:$home_dir/$image/log \
+	-v $(pwd)/../exp:$home_dir/$image/exp \
 	$image:$tag \
-	bash -c "tensorboard --logdir=$home_dir/$image/log/$log_dir"
+	bash -c "tensorboard --logdir=$home_dir/$image/exp/$exp_dir/$tb_dir"
