@@ -55,7 +55,8 @@ def test():
     inputs = torch.randn(batch_size, img_ch, img_height, img_width).to(device)
     ## decode
     z_dim = 5000
-    enc_net = SegEncoder(img_ch, img_height, img_width, z_dim).to(device)
+    conv_unit_ch = 32
+    enc_net = SegEncoder(img_ch, img_height, img_width, z_dim, conv_unit_ch).to(device)
     enc_net.train()
     outputs_list = enc_net(inputs)
     ## debug

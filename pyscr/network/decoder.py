@@ -52,7 +52,8 @@ def test():
     ## decode
     img_height = 120
     img_width = 160
-    dec_net = Decoder(img_height, img_width, z_dim).to(device)
+    deconv_unit_ch = 64
+    dec_net = Decoder(img_height, img_width, z_dim, deconv_unit_ch).to(device)
     dec_net.train()
     outputs = dec_net(inputs)
     ## debug
