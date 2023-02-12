@@ -11,5 +11,5 @@ python3 evaluate.py \
     --img_width 160 \
     --z_dim 5000 \
     --deconv_unit_ch 64 \
-    --load_weights_dir $exec_pwd/../weights/120pix5000z00001lre00001lrd1000sample64batch100epoch \
+    --load_exp_dir $exec_pwd/../exp/120pix5000z64deconv00001lre00001lrd1000sample64batch100epoch/100epoch \
     --flag_show_reconstracted_images

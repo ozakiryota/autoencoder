@@ -39,9 +39,9 @@ class RgbSegEvaluator(Evaluator):
         seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
         dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch, self.args.deconv_unit_ch)
 
-        rgb_enc_weights_path = os.path.join(self.args.load_weights_dir, 'rgb_encoder.pth')
-        seg_enc_weights_path = os.path.join(self.args.load_weights_dir, 'seg_encoder.pth')
-        dec_weights_path = os.path.join(self.args.load_weights_dir, 'decoder.pth')
+        rgb_enc_weights_path = os.path.join(self.args.load_exp_dir, 'rgb_encoder.pth')
+        seg_enc_weights_path = os.path.join(self.args.load_exp_dir, 'seg_encoder.pth')
+        dec_weights_path = os.path.join(self.args.load_exp_dir, 'decoder.pth')
         if self.device == torch.device('cpu'):
             loaded_rgb_enc_weights = torch.load(rgb_enc_weights_path, map_location={"cuda:0": "cpu"})
             print("load [GPU -> CPU]:", rgb_enc_weights_path)

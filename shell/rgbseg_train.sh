@@ -10,11 +10,11 @@ python3 rgbseg_train.py \
     --csv_target_col 0 1 \
     --img_height 120 \
     --img_width 160 \
-    --batch_size 64 \
+    --batch_size 32 \
     --z_dim 5000 \
-    --deconv_unit_ch 64 \
-    --conv_unit_ch 16 \
+    --deconv_unit_ch 128 \
+    --conv_unit_ch 4 \
     --enc_lr 1e-4 \
     --dec_lr 1e-4 \
     --num_epochs 100 \
-    --save_weights_step 100
+    --save_weights_step 10

@@ -29,6 +29,7 @@ class RgbSegTrainer(Trainer):
         self.criterion = torch.nn.MSELoss(reduction='mean')
         self.rgb_enc_optimizer, self.seg_enc_optimizer, self.dec_optimizer = self.getOptimizer()
         self.info_str = self.getInfoStr()
+        self.save_exp_dir = os.path.join(self.args.exp_root_dir, self.info_str)
         self.tb_writer = self.getWriter()
 
     def setArgument(self):
@@ -144,9 +145,7 @@ class RgbSegTrainer(Trainer):
         return loss
 
     def saveWeights(self, epoch):
-        save_weights_dir = os.path.join(self.args.save_weights_dir, self.info_str)
-        insert_index = save_weights_dir.find('batch') + len('batch')
-        save_weights_dir = save_weights_dir[:insert_index] + str(epoch) + save_weights_dir[insert_index + len(str(self.args.num_epochs)):]
+        save_weights_dir = os.path.join(self.save_exp_dir, str(epoch) + 'epoch')
         os.makedirs(save_weights_dir, exist_ok=True)
         save_rgb_enc_weights_path = os.path.join(save_weights_dir, 'rgb_encoder.pth')
         save_seg_enc_weights_path = os.path.join(save_weights_dir, 'seg_encoder.pth')

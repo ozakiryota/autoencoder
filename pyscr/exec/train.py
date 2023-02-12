@@ -27,6 +27,7 @@ class Trainer:
         self.criterion = torch.nn.MSELoss(reduction='mean')
         self.enc_optimizer, self.dec_optimizer = self.getOptimizer()
         self.info_str = self.getInfoStr()
+        self.save_exp_dir = os.path.join(self.args.exp_root_dir, self.info_str)
         self.tb_writer = self.getWriter()
     
     def setArgument(self):
@@ -46,9 +47,7 @@ class Trainer:
         arg_parser.add_argument('--dec_lr', type=float, default=1e-5)
         arg_parser.add_argument('--num_epochs', type=int, default=100)
         arg_parser.add_argument('--save_weights_step', type=int)
-        arg_parser.add_argument('--save_weights_dir', default='../../weights')
-        arg_parser.add_argument('--save_log_dir', default='../../log')
-        arg_parser.add_argument('--save_fig_dir', default='../../fig')
+        arg_parser.add_argument('--exp_root_dir', default='../../exp')
         return arg_parser
 
     def checkArgument(self):
@@ -124,7 +123,7 @@ class Trainer:
         return info_str
 
     def getWriter(self):
-        save_log_dir = os.path.join(self.args.save_log_dir, datetime.datetime.now().strftime("%Y%m%d_%H%M%S_") + self.info_str)
+        save_log_dir = os.path.join(self.save_exp_dir, "tb_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
         tb_writer = SummaryWriter(logdir=save_log_dir)
         print("save_log_dir =", save_log_dir)
         return tb_writer
@@ -186,9 +185,7 @@ class Trainer:
         print("loss: {:.4f}".format(loss_record[-1]))
 
     def saveWeights(self, epoch):
-        save_weights_dir = os.path.join(self.args.save_weights_dir, self.info_str)
-        insert_index = save_weights_dir.find('batch') + len('batch')
-        save_weights_dir = save_weights_dir[:insert_index] + str(epoch) + save_weights_dir[insert_index + len(str(self.args.num_epochs)):]
+        save_weights_dir = os.path.join(self.save_exp_dir, str(epoch) + 'epoch')
         os.makedirs(save_weights_dir, exist_ok=True)
         save_enc_weights_path = os.path.join(save_weights_dir, 'encoder.pth')
         save_dec_weights_path = os.path.join(save_weights_dir, 'decoder.pth')
@@ -209,7 +206,7 @@ class Trainer:
         plt.ylabel("Loss")
         plt.title("loss=" + '{:.4f}'.format(loss_record[-1]))
 
-        fig_save_path = os.path.join(self.args.save_fig_dir, self.info_str + '.jpg')
+        fig_save_path = os.path.join(self.save_exp_dir, 'loss.jpg')
         plt.savefig(fig_save_path)
 
 

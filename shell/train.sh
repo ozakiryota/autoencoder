@@ -15,4 +15,4 @@ python3 train.py \
     --enc_lr 1e-4 \
     --dec_lr 1e-4 \
     --num_epochs 100 \
-    --save_weights_step 100
+    --save_weights_step 10

@@ -36,8 +36,7 @@ class Evaluator:
         arg_parser.add_argument('--img_width', type=int, default=320)
         arg_parser.add_argument('--z_dim', type=int, default=100)
         arg_parser.add_argument('--deconv_unit_ch', type=int, default=32)
-        arg_parser.add_argument('--load_weights_dir', default='../../weights')
-        arg_parser.add_argument('--save_fig_dir', default='../../fig')
+        arg_parser.add_argument('--load_exp_dir', default='../../exp')
         arg_parser.add_argument('--flag_show_reconstracted_images', action='store_true')
         arg_parser.add_argument('--show_h', type=int, default=5)
         arg_parser.add_argument('--show_w', type=int, default=10)
@@ -64,8 +63,8 @@ class Evaluator:
         enc_net = Encoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=False)
         dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.deconv_unit_ch)
 
-        enc_weights_path = os.path.join(self.args.load_weights_dir, 'encoder.pth')
-        dec_weights_path = os.path.join(self.args.load_weights_dir, 'decoder.pth')
+        enc_weights_path = os.path.join(self.args.load_exp_dir, 'encoder.pth')
+        dec_weights_path = os.path.join(self.args.load_exp_dir, 'decoder.pth')
         if self.device == torch.device('cpu'):
             loaded_enc_weights = torch.load(enc_weights_path, map_location={"cuda:0": "cpu"})
             print("load [GPU -> CPU]:", enc_weights_path)
@@ -158,8 +157,8 @@ class Evaluator:
             plt.imshow(real_image_np)
 
         plt.tight_layout()
-        os.makedirs(self.args.save_fig_dir, exist_ok=True)
-        plt.savefig(os.path.join(self.args.save_fig_dir, save_name))
+        os.makedirs(self.args.load_exp_dir, exist_ok=True)
+        plt.savefig(os.path.join(self.args.load_exp_dir, save_name))
 
     def saveScoreGraph(self, score_list, label_list):
         plt.figure()
@@ -167,7 +166,7 @@ class Evaluator:
         plt.ylabel("Anomaly label")
         plt.scatter(score_list, label_list)
         plt.yticks([0.0, 1.0], [False, True])
-        plt.savefig(os.path.join(self.args.save_fig_dir, 'anomaly_score'))
+        plt.savefig(os.path.join(self.args.load_exp_dir, 'anomaly_score'))
 
 
 if __name__ == '__main__':

@@ -11,9 +11,7 @@ python3 rgbseg_evaluate.py \
     --img_height 120 \
     --img_width 160 \
     --z_dim 5000 \
-    --deconv_unit_ch 64 \
-    --conv_unit_ch 16 \
-    --load_weights_dir $exec_pwd/../weights/rgbseg120pix5000z00001lre00001lrd1000sample64batch100epoch \
-    --flag_show_reconstracted_images \
-    --show_h 2 \
-    --show_w 10
+    --deconv_unit_ch 128 \
+    --conv_unit_ch 4 \
+    --load_exp_dir $exec_pwd/../exp/rgbseg120pix5000z4conv128deconv00001lre00001lrd1000sample32batch100epoch/100epoch \
+    --flag_show_reconstracted_images
