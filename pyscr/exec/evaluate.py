@@ -61,6 +61,8 @@ class Evaluator:
 
     def getNetwork(self):
         enc_net = Encoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=False)
+        if self.args.z_dim < 0:
+            self.args.z_dim = enc_net.dim_fc_in
         dec_net = Decoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.deconv_unit_ch)
 
         enc_weights_path = os.path.join(self.args.load_exp_dir, 'encoder.pth')

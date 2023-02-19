@@ -40,6 +40,8 @@ class RgbSegTrainer(Trainer):
 
     def getNetwork(self):
         rgb_enc_net = RgbEncoder(self.args.img_height, self.args.img_width, self.args.z_dim, is_train=True)
+        if self.args.z_dim < 0:
+            self.args.z_dim = rgb_enc_net.dim_fc_in
         seg_enc_net = SegEncoder(self.args.num_classes, self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch)
         dec_net = RgbSegDecoder(self.args.img_height, self.args.img_width, self.args.z_dim, self.args.conv_unit_ch, self.args.deconv_unit_ch)
 
