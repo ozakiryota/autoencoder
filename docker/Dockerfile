@@ -34,12 +34,9 @@ RUN apt-get update && \
 ########## Cache Busting ##########
 ARG cache_bust=1
 ########## autoencoder ##########
-# RUN cd $home_dir && \
-# 	git clone https://github.com/ozakiryota/autoencoder.git && \
-# 	pip3 install \
-# 		matplotlib \
-# 		tqdm
-RUN pip3 install \
+RUN cd $home_dir && \
+	git clone https://github.com/ozakiryota/autoencoder.git && \
+	pip3 install \
 		matplotlib \
 		tqdm
 ########## Initial Position ##########

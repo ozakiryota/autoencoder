@@ -12,6 +12,7 @@ xhost +
 
 image="autoencoder"
 tag="latest"
+exec_pwd=$(cd $(dirname $0); pwd)
 home_dir="/home/user"
 
 docker run \
@@ -23,6 +24,6 @@ docker run \
 	-v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--net=host \
 	-p 6006:6006 \
-	-v $(pwd)/../exp:$home_dir/$image/exp \
+	-v $exec_pwd/../exp:$home_dir/$image/exp \
 	$image:$tag \
 	bash -c "tensorboard --logdir=$home_dir/$image/exp/$exp_dir/$tb_dir"
